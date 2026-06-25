@@ -1,0 +1,37 @@
+---
+title: "なぜ Markdown ではなく MDX を選んだか"
+description: "プレーンな Markdown と MDX の違い、技術ブログで MDX が便利な理由をまとめます。"
+date: "2026-06-20"
+tags: ["MDX", "Next.js", "設計"]
+---
+
+技術ブログでは、ただ文章を書くだけでなく、インタラクティブな要素や独自コンポーネントを差し込みたくなる場面があります。MDX はそれを可能にします。
+
+## MDX の利点
+
+1. Markdown の手軽さはそのまま
+2. 任意の React コンポーネントを本文に埋め込める
+3. `remark` / `rehype` プラグインで拡張できる
+
+## 表も書ける（GFM）
+
+| 形式 | コンポーネント埋め込み | 学習コスト |
+| ---- | :--------------------: | ---------- |
+| Markdown | × | 低 |
+| MDX | ○ | 中 |
+
+> プレーン Markdown で十分なら無理に MDX にする必要はありません。拡張性を取るなら MDX が有力です。
+
+## 画像も入れられます
+
+Markdown 記法で `public/` 配下の画像を参照できます（basePath は自動付与）。
+
+![サンプルのカバー画像](/images/sample-cover.svg)
+
+`next/image` を使いたい場合は MDX 内に直接 JSX で書くこともできます。
+
+### next/image を使う場合
+
+MDX 内に直接 JSX で書けます。`width` / `height` の指定が必須です。
+
+<Image src="/images/sample-cover.svg" width="1200" height="630" alt="next/image のサンプル" />
