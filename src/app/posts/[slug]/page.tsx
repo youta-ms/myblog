@@ -18,6 +18,7 @@ import {
   getHeadings,
   getPostBySlug,
 } from "@/lib/posts";
+import { absoluteUrl } from "@/lib/site";
 
 export const dynamicParams = false;
 
@@ -33,7 +34,28 @@ export async function generateMetadata({
   const { slug } = await params;
   try {
     const post = getPostBySlug(slug);
-    return { title: post.title, description: post.description };
+    const canonical = absoluteUrl(`/posts/${slug}/`);
+    const ogImage = post.cover ? absoluteUrl(post.cover) : undefined;
+    return {
+      title: post.title,
+      description: post.description,
+      alternates: { canonical },
+      openGraph: {
+        type: "article",
+        url: canonical,
+        title: post.title,
+        description: post.description,
+        publishedTime: post.date,
+        tags: post.tags,
+        ...(ogImage ? { images: [{ url: ogImage }] } : {}),
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: post.title,
+        description: post.description,
+        ...(ogImage ? { images: [ogImage] } : {}),
+      },
+    };
   } catch {
     return {};
   }

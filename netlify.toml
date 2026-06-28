@@ -1,0 +1,15 @@
+# Netlify デプロイ設定（Next.js ランタイム）
+# @netlify/plugin-nextjs が SSG/SSR/ISR と next/image の最適化を有効化する。
+# 公開URLは Netlify が環境変数 URL を自動注入するため通常は追加設定不要。
+# 独自ドメインに切り替える場合は、Netlify の環境変数に
+# NEXT_PUBLIC_SITE_ORIGIN（例: https://example.com）を設定する。
+
+[build]
+  command = "npm run build"
+
+[build.environment]
+  # package.json の engines に合わせる（Next 16 / React 19）
+  NODE_VERSION = "24"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

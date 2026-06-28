@@ -3,6 +3,7 @@ title: "なぜ Markdown ではなく MDX を選んだか"
 description: "プレーンな Markdown と MDX の違い、技術ブログで MDX が便利な理由をまとめます。"
 date: "2026-06-20"
 tags: ["MDX", "Next.js", "設計"]
+draft: true
 ---
 
 技術ブログでは、ただ文章を書くだけでなく、インタラクティブな要素や独自コンポーネントを差し込みたくなる場面があります。MDX はそれを可能にします。
@@ -26,7 +27,7 @@ tags: ["MDX", "Next.js", "設計"]
 
 Markdown 記法で `public/` 配下の画像を参照できます（basePath は自動付与）。
 
-![サンプルのカバー画像](/images/sample-cover.svg)
+![サンプルのカバー画像](/images/sample-cover.png)
 
 `next/image` を使いたい場合は MDX 内に直接 JSX で書くこともできます。
 
@@ -34,4 +35,4 @@ Markdown 記法で `public/` 配下の画像を参照できます（basePath は
 
 MDX 内に直接 JSX で書けます。`width` / `height` の指定が必須です。
 
-<Image src="/images/sample-cover.svg" width="1200" height="630" alt="next/image のサンプル" />
+<Image src="/images/sample-cover.png" width="1200" height="630" alt="next/image のサンプル" />

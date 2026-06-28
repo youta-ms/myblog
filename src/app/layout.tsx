@@ -4,6 +4,7 @@ import "./globals.css";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 import { ThemeProvider } from "@/components/theme-provider";
+import { siteConfig } from "@/lib/site";
 
 const notoSansJp = Noto_Sans_JP({
   subsets: ["latin"],
@@ -19,11 +20,28 @@ const jetBrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.url),
   title: {
-    default: "ひなたの技術メモ",
-    template: "%s | ひなたの技術メモ",
+    default: siteConfig.name,
+    template: `%s | ${siteConfig.name}`,
   },
-  description: "Web開発・インフラ・日々の学びを書く技術ブログ",
+  description: siteConfig.description,
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    locale: "ja_JP",
+    url: siteConfig.url,
+    siteName: siteConfig.name,
+    title: siteConfig.name,
+    description: siteConfig.description,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteConfig.name,
+    description: siteConfig.description,
+  },
 };
 
 export default function RootLayout({
