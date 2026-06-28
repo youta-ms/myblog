@@ -13,6 +13,7 @@ export type PostMeta = {
   tags: string[];
   cover?: string; // /images/... のパス（任意）
   readingTime: number; // 分
+  draft: boolean; // true なら下書き（一覧・sitemap・直URL すべてから除外）
 };
 
 export type Post = PostMeta & { content: string };
@@ -41,16 +42,28 @@ function readPostFile(slug: string): Post {
     tags: data.tags ?? [],
     cover: data.cover,
     readingTime: calcReadingTime(content),
+    draft: data.draft === true,
     content,
   };
 }
 
+// frontmatter の draft フラグだけを軽量に判定する。
+function isDraft(slug: string): boolean {
+  const fullPath = path.join(POSTS_DIR, `${slug}.mdx`);
+  const { data } = matter(fs.readFileSync(fullPath, "utf8"));
+  return data.draft === true;
+}
+
+// 公開対象の slug 一覧。下書き(draft: true)は除外する。
+// ここで除外することで、一覧・タグ・sitemap・generateStaticParams(記事生成)・
+// 直URLアクセス(404)まで一括で下書きが非公開になる。
 export function getAllSlugs(): string[] {
   if (!fs.existsSync(POSTS_DIR)) return [];
   return fs
     .readdirSync(POSTS_DIR)
     .filter((f) => f.endsWith(".mdx") && !f.startsWith("_"))
-    .map((f) => f.replace(/\.mdx$/, ""));
+    .map((f) => f.replace(/\.mdx$/, ""))
+    .filter((slug) => !isDraft(slug));
 }
 
 export function getPostBySlug(slug: string): Post {
