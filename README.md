@@ -59,7 +59,7 @@ tags: ["Next.js", "TypeScript"]
 
 ## 画像を入れる
 
-画像は `public/images/` に置き、記事から参照します。`basePath`（GitHub Pages のサブパス）は自動で付与されます。
+画像は `public/images/` に置き、記事から参照します。`next/image` を使った画像は Netlify 上で自動的に最適化（WebP/AVIF 変換・リサイズ）されます。
 
 ### 1. Markdown 記法（基本・おすすめ）
 
@@ -89,19 +89,15 @@ plain `<img>` でレンダリングされるため、寸法指定は不要です
 </div>
 ```
 
-> 補足: この静的エクスポート構成では `next/image` は basePath を自動付与しないため、`src/components/mdx.tsx` のラッパー側で補っています。外部URL（`https://...`）の画像はそのまま使えます（basePath は付きません）。
+## Netlify へのデプロイ
 
-## GitHub Pages へのデプロイ
+Next.js ランタイム（`@netlify/plugin-nextjs`）で動かす構成です。`output: "export"` は使わず、SSG/SSR/ISR と `next/image` の自動最適化が利用できます。
 
-1. このリポジトリを GitHub に push（ブランチ `main`）。
-2. リポジトリの **Settings → Pages → Build and deployment → Source** を **GitHub Actions** に変更。
-3. `main` への push で `.github/workflows/deploy.yml` が走り、自動でビルド・公開されます。
+1. このリポジトリを GitHub に push。
+2. Netlify で **Add new site → Import an existing project** から該当リポジトリを選択。
+3. ビルド設定は `netlify.toml` に定義済み（`npm run build` / Node 24 / Next プラグイン）。そのまま **Deploy** すれば公開されます。
 
-### basePath について
-
-`https://<ユーザー名>.github.io/<リポジトリ名>/` で公開する場合、サブパス配信になるため `basePath` が必要です。本構成では GitHub Actions の `configure-pages` が出力する `base_path` を環境変数 `NEXT_PUBLIC_BASE_PATH` 経由で `next.config.ts` に渡し、自動設定します。手元での確認時は未設定（ルート配信）で動きます。
-
-- 独自ドメイン、または `<ユーザー名>.github.io` リポジトリ（ルート配信）の場合は basePath は空のままで OK。
+公開URL（OGP・sitemap で使う絶対URL）は、Netlify がビルド時に環境変数 `URL` を自動注入するため通常は設定不要です。独自ドメインに切り替える場合のみ、Netlify の環境変数に `NEXT_PUBLIC_SITE_ORIGIN`（例: `https://example.com`）を設定してください。
 
 ## ディレクトリ構成
 
@@ -114,15 +110,18 @@ src/
   components/               # site-header, post-card, ui/（shadcn）
   content/posts/*.mdx       # 記事本体
   lib/posts.ts              # frontmatter の読み込み・一覧取得
-next.config.ts              # 静的エクスポート / basePath / MDX 設定
+  lib/site.ts               # サイト共通設定（公開URL / SEO）
+  app/sitemap.ts            # sitemap.xml 生成
+  app/robots.ts             # robots.txt 生成
+next.config.ts              # Next ランタイム / MDX 設定
+netlify.toml                # Netlify デプロイ設定
 biome.json                  # Biome（lint + format）設定
-.github/workflows/deploy.yml
 ```
 
 ## 参考リンク
 
-- Next.js Static Exports: https://nextjs.org/docs/app/building-your-application/deploying/static-exports
-- Next.js × GitHub Pages サンプル (gregrickaby/nextjs-github-pages): https://github.com/gregrickaby/nextjs-github-pages
+- Next.js on Netlify（公式）: https://docs.netlify.com/build/frameworks/framework-setup-guides/nextjs/overview/
+- Next.js Image Component: https://nextjs.org/docs/app/api-reference/components/image
 - Biome（公式・設定ガイド）: https://biomejs.dev/guides/configure-biome/
 - Biome を Next.js で使う: https://www.timsanteford.com/posts/how-to-use-biome-with-next-js-for-linting-and-formatting/
 - shadcn/ui: https://ui.shadcn.com/docs/installation/next

@@ -1,21 +1,22 @@
 // サイト全体の設定。SEO メタデータ・sitemap・robots で共通利用する。
 //
-// origin: 公開オリジン。独自ドメインなら NEXT_PUBLIC_SITE_ORIGIN で上書き。
-//   既定は GitHub Pages のプロジェクトページ (https://youta-ms.github.io)。
-// basePath: サブパス配信時の接頭辞。GitHub Actions が NEXT_PUBLIC_BASE_PATH を
-//   設定する（next.config.ts と同じ値）。ルート配信なら空文字。
+// origin: 公開オリジン。優先順位は
+//   1) NEXT_PUBLIC_SITE_ORIGIN（独自ドメイン等を明示したい場合に設定）
+//   2) URL（Netlify がビルド時に本番URLを自動注入する）
+//   3) ローカル開発用のフォールバック
+// Netlify はルート配信のため basePath は不要（空文字）。
 const origin = (
-  process.env.NEXT_PUBLIC_SITE_ORIGIN ?? "https://youta-ms.github.io"
+  process.env.NEXT_PUBLIC_SITE_ORIGIN ??
+  process.env.URL ??
+  "http://localhost:3000"
 ).replace(/\/$/, "");
-const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
 
 export const siteConfig = {
   name: "ひなたの技術メモ",
   description: "Web開発・インフラ・日々の学びを書く技術ブログ",
   origin,
-  basePath,
-  // 公開URLの基点（例: https://youta-ms.github.io/myblog）
-  url: `${origin}${basePath}`,
+  // 公開URLの基点
+  url: origin,
 } as const;
 
 // サイト内パスを絶対URLに変換する。`path` は先頭スラッシュ付きで渡す。
