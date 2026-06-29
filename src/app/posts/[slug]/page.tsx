@@ -4,11 +4,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { compileMDX } from "next-mdx-remote/rsc";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import rehypeExternalLinks from "rehype-external-links";
 import rehypePrettyCode from "rehype-pretty-code";
 import rehypeSlug from "rehype-slug";
+import remarkDirective from "remark-directive";
 import remarkGfm from "remark-gfm";
 import { AuthorBio } from "@/components/author-bio";
 import { mdxComponents } from "@/components/mdx";
+import { Mermaid } from "@/components/mermaid";
 import { TagLink } from "@/components/tag-link";
 import { Toc } from "@/components/toc";
 import {
@@ -18,6 +21,8 @@ import {
   getHeadings,
   getPostBySlug,
 } from "@/lib/posts";
+import { rehypeMermaidPre } from "@/lib/rehype-mermaid-pre";
+import { remarkCallouts } from "@/lib/remark-callouts";
 import { absoluteUrl } from "@/lib/site";
 
 export const dynamicParams = false;
@@ -77,7 +82,7 @@ export default async function PostPage({
     components: mdxComponents,
     options: {
       mdxOptions: {
-        remarkPlugins: [remarkGfm],
+        remarkPlugins: [remarkGfm, remarkDirective, remarkCallouts],
         rehypePlugins: [
           rehypeSlug,
           [
@@ -92,7 +97,16 @@ export default async function PostPage({
               content: { type: "text", value: "#" },
             },
           ],
+          // mermaid ブロックは pretty-code より先に <pre class="mermaid"> へ変換する。
+          rehypeMermaidPre,
           [rehypePrettyCode, { theme: "github-dark" }],
+          [
+            rehypeExternalLinks,
+            {
+              target: "_blank",
+              rel: ["noopener", "noreferrer"],
+            },
+          ],
         ],
       },
     },
@@ -129,6 +143,7 @@ export default async function PostPage({
       <div className="prose prose-neutral max-w-none dark:prose-invert prose-headings:scroll-mt-20 prose-a:text-brand prose-a:underline-offset-2 hover:prose-a:text-brand/80 prose-code:rounded-md prose-code:bg-muted prose-code:px-1.5 prose-code:py-0.5 prose-code:font-normal prose-code:text-sm prose-code:before:content-none prose-code:after:content-none prose-blockquote:border-l-brand prose-blockquote:font-normal prose-blockquote:not-italic prose-blockquote:text-muted-foreground prose-img:rounded-lg">
         {content}
       </div>
+      <Mermaid />
 
       <AuthorBio />
 
